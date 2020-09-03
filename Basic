@@ -1,0 +1,86 @@
+# ---------------------------------------------------------------------------------------------
+
+''' something abount datebase '''
+
+Question 1: Why do not use profile to store the data other than database
+Answer 1: Datebase is more Database is more conducive to data management than files.
+     There are several disadvantages of saving data in files:
+   (1): Security issues of documents;
+   (2): Documents are not conducive to query and data management;
+   (3): Files are not conducive to storing massive data;
+   (4): It is not convenient to control the file in the program;
+   
+# ----------------------------------------------------------------------------------------------
+
+'''      Introduction to mainstream databases   '''
+
+(1)  SQL Server & sybase
+Mostly used by Microsoft and .net programmers, suitable for medium and large projects, characterized by high performance
+多用于微软，.net程序员， 适合于中型和大型项目，特点是性能高
+
+(2) Oracle 数据库
+多用于甲骨文， java程序员必备， 适合于大型项目，中小型项目很少用， 特点是适合处理复杂业务逻辑
+Mostly used for Oracle, essential for java programmers, suitable for large projects, and rarely used for small and medium-sized projects, 
+characterized by being suitable for processing complex business logic
+
+(3) mysql 数据库
+是sun 公司创造，现属于甲骨文公司，适合于中大型项目， 特点是并发性好， 对简单的sql处理效果高
+Created by Sun Company and now belongs to Oracle Company. It is suitable for medium and large projects. 
+It is characterized by good concurrency and high effect on simple SQL processing.
+
+(4) db2 数据库
+属于Ibm公司，处理海量数据，大型项目， 特点是功能很强悍
+Belongs to Ibm company, handles massive data, large-scale projects, and is characterized by powerful functions
+
+(5) informix 数据库
+属于Ibm公司，一般用于银行系统， 特点是安全性高
+Belongs to Ibm company, generally used in banking system, characterized by high security
+
+# ----------------------------------------------------------------------------------------------
+
+'''  Basic use   '''
+
+（1）Connect to mysql:
+    cmd>mysql -h 主机 -u 用户名 -p  【回车】
+    for example:          >> mysql -h localhost -u root -p      可能的问题： 没有配置环境变量  Possible problems: No environment variables are configured.
+    说明： 如果不写 -h localhost 默认是连接本地；
+          如果你需要远程登录到另外一个mysql,则需要修改配置，一般情况下不让远程登陆。
+          
+（2）Shut down and start mysql:
+    启动： >> net start mysql
+    关闭： >> net stop mysql
+    注意：这里写的mysql不是固定的，取决于当时安装mysql时你给他的服务名。
+ 
+# ----------------------------------------------------------------------------------------------
+
+'''  Introduction to the three-tier structure of mysql   '''
+
+       ---------------------------------------------
+     ｜ MySQL dbms >> Databases >> Datatype(tables) ｜
+       ---------------------------------------------
+          ^
+          ^
+          ^    
+     Database console : What we actually use
+     ----------------
+
+# ----------------------------------------------------------------------------------------------
+
+'''  SQL statement classification   '''
+
+（1）ddl语句（数据定义语句）
+    create、alter
+    
+（2）dml语句（数据操作语句）
+    update、insert、delete
+    
+（3）dpl语句（数据查询语句）
+    select
+    
+（4）dcl语句（数据控制语句）
+    在处理数据库事务和mysql用户管理的时候
+    grant、revoke、commit、rollback、savepoint etc
+  
+  # ----------------------------------------------------------------------------------------------
+
+end！
