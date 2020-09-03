@@ -1,0 +1,112 @@
+# ----------------------------------------------------------------------------------------------
+
+'''  basic introduction   '''
+
+>> 基本语法：通过一个指令来创建数据库 
+Basic syntax: create a database through a command
+    ------------------------------------------------------------- 
+   | CREATE DATABASE [IF NOT EXISTS] db_name                     |
+   |        [create_specification [, create_specification] ...]  |
+    -------------------------------------------------------------  
+    
+create_specification：
+    [DEFAULT] CHARACTER SET charset_name
+    [DEFAULT] COLLATE collation_name
+>> 说明:
+（1）大写字母是固定的
+（2）[]是可选项
+（3）小写字母是具体的内容
+（4）characater set 是给该数据库指定的字符集，通常我们使用utf8
+（5）collate 校验规则，就是指的表的排序的规则和查询时的规则。
+
+--------------------------------------------------------------------------------------------------------   
+>> 案例                                                                                                 |
+（1） 创建一个名称为db1的数据库：                                                                          |
+                                                                                                       |
+    >> create database db1;                                                                            |
+    说明：当创建数据库没有指定字符集和校验规则时，系统使用默认，字符集为utf8，校验规则为utf8_general_ci             |
+        为什么默认是utf8呢？因为utf8支持中文。utf8_general_ci 是支持utf8, 并且不区分大小写。                    |
+                                                                                                       |
+（2）创建一个使用utf-8字符集的db2数据库：                                                                   |
+                                                                                                       |
+    >> create database db2 character set utf8;                                                         |
+                                                                                                       |
+（3）创建一个使用utf-8字符集的带有校对规则的db3的数据库：                                                      |
+                                                                                                       |
+    >> create database db3 character set utf8 collate utf8_general_ci;                                 |
+-------------------------------------------------------------------------------------------------------- 
+
+>> 字符集和校验规则的区别
+  查看所有 ‘字符集’ 以及 ‘校验规则’
+  >> show character set;
+
+  ''' 字符集 的区别 '''
+  使用character set latin1, 则加入不了中文, 可以自己测试：
+  >> create database db4 character set Latin1;
+  >> create table test (name varchar(20));
+  >> insert into test values("中文")
+  会发生报错。
+  
+  使用 character set utf8 则可以加入中文
+  
+  
+  ''' 校验规则 的区别 '''
+  example： utf8_general_ci 是支持utf8, 不区分大小写；
+            utf8_bin 是支持utf8, 区分大小写 means "a" if different from "A"；
+            
+            utf8_general_ci
+            >> create database db5 character set utf8;
+            >> create table test1 (name varchar(20));
+            >> insert into test1 values("a");
+            >> insert into test1 values("A");
+            >> select name from test1 where name = "a";  
+            Result:
+             ------
+            | name |
+             ------
+            | "a"  |
+             ------
+            | "A"  |
+             ------
+             因为未区分大小写字母，所以认为 "A" 也等于 "a"。
+             
+            >> select name from test1 order by name; 
+             ------
+            | name |
+             ------
+            | "a"  |
+             ------
+            | "A"  |
+             ------
+             由于未区分大小写字母，所以均按 大写字母 "A" 的ASCII码来排序。  
+             
+             
+            utf8_bin
+            >> create database db5 character set bin;
+            >> create table test1 (name varchar(20));
+            >> insert into test1 values("a");
+            >> insert into test1 values("A");
+            >> select name from test1 where name = "a";  
+            Result:
+             ------
+            | name |
+             ------
+            | "a"  |
+             ------
+             因为区分了大小写，所以只认为"a" = "a"。
+             
+            >> select name from test1 order by name; 
+             ------
+            | name |
+             ------
+            | "A"  |
+             ------
+            | "a"  |
+             ------
+             因为 "A" 的ASCII码比 "a"的ASCII码小，所以排前面。
+             
+             会对查询结果造成差别，所以一般使用的时候就使用默认的，不要去修改collate。
+  
+# ----------------------------------------------------------------------------------------------
+
+end!
