@@ -1,1 +1,183 @@
+# ----------------------------------------------------------------------------------------------
 
+'''  show database   '''
+
+基本语法：
+>>show databases;
++--------------------+
+| Database           |
++--------------------+
+| db1                |
+| information_schema |
+| mysql              |
+| performance_schema |
+| study              |
+| sys                |
++--------------------+
+6 rows in set (0.00 sec)
+
+# ----------------------------------------------------------------------------------------------
+
+'''  Show instructions for creating a database   '''
+               显示创建数据库的指令
+
+基本语法：
+>>show create database + 数据库名；
+
+example: >> show create database study;
++----------+---------------------------------------------------------------------------------------------------------------------------------+
+| Database | Create Database                                                                                                                 |
++----------+---------------------------------------------------------------------------------------------------------------------------------+
+| study    | CREATE DATABASE `study` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */ |
++----------+---------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+说明：
+（1） mysql建议我们关键字使用大写，但是这个不是必须；
+    MySQL recommends that we use uppercase keywords, but this is not required;
+
+（2） ‘’反引号，可以避免你使用的数据库名称，刚好是关键字；
+    The ‘’ backtick can avoid the database name you use, which happens to be a keyword；
+
+（3）/*!40100 default.....*/ 表示如果当前mysql版本大于mysql4.01版本就执行；
+    /*!40100 default.....*/ means to execute if the current mysql version is greater than mysql4.01;
+    example: >> /*!40100 show create database study */;
+            +----------+---------------------------------------------------------------------------------------------------------------------------------+
+            | Database | Create Database                                                                                                                 |
+            +----------+---------------------------------------------------------------------------------------------------------------------------------+
+            | study    | CREATE DATABASE `study` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */ |
+            +----------+---------------------------------------------------------------------------------------------------------------------------------+
+            1 row in set (0.00 sec)
+      
+             >> /*!80100 show create database study */;
+             Query OK, 0 rows affected (0.00 sec)
+             因为不存在8.01版本，所以不执行操作，没有结果展示。
+
+# ----------------------------------------------------------------------------------------------
+
+'''  Database delete instruction   '''
+            数据库删除指令
+
+基本语法：
+>>drop database [if exists] + 数据库名;
+
+[if exists] 为可选项
+
+example: mysql> drop database db1;
+         Query OK, 0 rows affected (0.00 sec)
+
+         mysql> drop database db1;
+         ERROR 1008 (HY000): Can't drop database 'db1'; database doesn't exist
+
+         mysql> drop database if exists db1;
+         Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+# ----------------------------------------------------------------------------------------------
+
+'''  View the current mysql database connection status  '''
+               查看当前mysql数据库连接情况
+
+基本语法：
+>>show processlist;
++----+-----------------+-----------+------+---------+-------+------------------------+------------------+
+| Id | User            | Host      | db   | Command | Time  | State                  | Info             |
++----+-----------------+-----------+------+---------+-------+------------------------+------------------+
+|  5 | event_scheduler | localhost | NULL | Daemon  | 17462 | Waiting on empty queue | NULL             |
+| 10 | root            | localhost | NULL | Query   |     0 | starting               | show processlist |
++----+-----------------+-----------+------+---------+-------+------------------------+------------------+
+2 rows in set (0.00 sec)
+
+如果 localhost后面带端口， 例如localhost：49291， 这里的端口是你的电脑与mysql监听端口3306遵从tcp协议交互的端口。
+
+Question：Why can a computer have up to 65535 ports?
+          为什么一个电脑最多可以有 65535 个端口？
+          
+Answer：
+Because a port is represented by two bytes, and a byte is composed of 8 binary numbers, a port has a total of 16 binary numbers. 
+Excluding the bit "0000000000000000", a total of 2 ** 16-1 = 65535.
+因为一个端口是使用两个字节表示，而一个字节是8个二进制数组成，所以一个端口共有16位二进制数目，排除掉“0000000000000000” 这一位，则一共有2 ** 16 - 1 = 65535.
+
+# ----------------------------------------------------------------------------------------------
+
+'''  Database backup and recovery  '''
+          数据库备份与恢复
+
+>> 备份数据库
+基本语法：
+cmd>mysqldump -u root -p [-B] 数据库名称 > 存放文件地址和文件名(.sql, .bak)
+如果我们在备份一个数据库时， 也带上 -B 参数，更好，在恢复数据库时，不需要再创建空数据库；
+
+example:wuli:~ yuze$ mysqldump -u root -p study > study.sql
+        Enter password: ********
+        wuli:~ yuze$ ls
+        Downloads			Pictures			msi.lic     Applications			Library				Public				 study.sql
+        Movies    Desktop				Music	   Documents			Parallels			bash_profile
+
+
+使用细节： 
+（1） 如果我们只希望备份数据库的某几张表
+cmd>mysqldump -u root -p 数据库名 表名1 表名2 > 存放文件地址和文件名
+example >> wuli:~ yuze$ mysqldump -u root -p study cost  > study.sql
+
+（1）如果同时备份几个数据库
+cmd>mysqldump -u root -p -B 数据库1 数据库2 > 存放文件地址和文件名
+example: >> wuli:~ yuze$ mysqldump -u root -p -B sys study > study.sql
+
+
+>> 恢复数据库
+基本语法：
+step one: create database + 数据库名（比如‘study’）;
+step two: use study;
+step three: source + 数据地址和名;;
+
+example:mysql> drop database study;
+        Query OK, 2 rows affected (0.01 sec)
+
+        mysql> create database study;
+        Query OK, 1 row affected (0.00 sec)
+
+        mysql> use study;
+        Database changed
+        mysql> source study.sql
+        Query OK, 0 rows affected (0.00 sec)
+        ...
+        Query OK, 0 rows affected (0.00 sec)
+
+        mysql> show tables;
+        +-----------------+
+        | Tables_in_study |
+        +-----------------+
+        | cost            |
+        | study           |
+        +-----------------+
+        2 rows in set (0.00 sec)
+        
+使用细节：恢复数据库的一张或者几张表（一定要先use到目的数据库）
+cmd>source 备份的文件全路径
+
+
+# ----------------------------------------------------------------------------------------------
+
+'''  Modify the database  '''
+          修改数据库
+
+基本语法：
+ALTER DATABASE [IF EXISTS] db_name [alter_specification [, alter_specification] ...]
+
+alter_specification:
+[DEFAULT] CHARACTER SET charset_name
+[DEFAULT] COLLATE collation_name
+
+说明：
+对数据库的修改主要指的是修改它的字符集（character set）,校验规则（collate);
+
+example:mysql> alter database study character set utf8 collate utf8_general_ci;
+        Query OK, 1 row affected, 2 warnings (0.00 sec)
+
+        or (character set utf8 >>>>>>>>> charset=utf8)
+        mysql> alter database study charset=utf8 collate utf8_general_ci;
+        Query OK, 1 row affected, 2 warnings (0.00 sec)
+        
+# ----------------------------------------------------------------------------------------------
+
+done!
