@@ -1,0 +1,369 @@
+# ----------------------------------------------------------------------------------------------
+
+'''    create the table    '''
+
+基本语法：
+CREATE TABLE table_name 
+(
+   field1 datatype,
+   field2 datatype,
+   field3 datatype
+)character set 字符集 collate 校对规则 engine 存储引擎方式
+
+说明：
+(1)大写字体都是关键字，不可更改
+(2)field:指定列名    
+(3)datatype:指定列类型（这里的数据类型指的是mysql数据类型）
+(4)character set 字符集，如果没有设置，则以表所在的数据库字符集为准；如果数据库也没有设置字符集，则以mysql默认的字符集为准，即为 utf8.
+(5)collate 校验规则，执行标准同character set.
+(6)engine表示表的引擎，例如InnoDB.
+   total: mysql> show engines;
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+    | Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+    | ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+    | BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+    | MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+    | FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+    | MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+    | PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+    | InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+    | MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+    | CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+  
+example:
+mysql> create table example(        
+    -> id int,                     >>>> int:整数
+    -> name varchar(60),           >>>> varchar(60):少于等于60个的字符
+    -> password char(32),          >>>> char 32位的md5的值
+    -> birthday date               >>>> date:日期
+    -> )character set utf8 engine MyISAM;
+Query OK, 0 rows affected, 1 warning (0.05 sec)
+
+细节说明：
+不同的存储引擎创建的表文件不一样；
+The table files created by different storage engines are different;
+
+当engine MyISAM时，则创建的表存储时将会有三个文件，分别存储表的结构（*.frm），索引(*.MYI)，数据(*.MYD)；
+When engine MyISAM is used, the created table will be stored in three files, which store the structure of the table (*.frm), index (*.MYI), and data (*.MYD);
+
+当engine InnoDB时，则创建的表存储时只会有一个文件，其他的数据则放在了别的地方...
+When the engine is InnoDB, the created table will only have one file when storing, and the other data will be placed elsewhere...
+
+# ----------------------------------------------------------------------------------------------
+
+'''  datatype   '''
+
+基本介绍：
+
+（1）数值类型
+    重点是所能允许的数值范围.
+    
+>> TINYINT	      1 byte	 小整数值            带符号范围：(-127, 128) signed 无符号范围：（0，255）unsigned
+>> SMALLINT	      2 bytes	 大整数值            
+>> MEDIUMINT	   3 bytes	 大整数值
+>> INT/INTEGER    4 bytes	 大整数值
+>> BIGINT	      8 bytes	 极大整数值
+>> FLOAT	         4 bytes	 单精度浮点数值
+>> DOUBLE	      8 bytes	 双精度浮点数值
+>> DECIMAL	      对DECIMAL(M,D)，如果M>D，为M+2否则为D+2,小数值
+
+example:
+   带符号的范围展示：
+   >>mysql> create table test (num tinyint);
+     Query OK, 0 rows affected (0.03 sec)
+     
+   >>mysql> insert into test values(-129);
+     ERROR 1264 (22003): Out of range value for column 'num' at row 1
+     
+   >>mysql> insert into test values(-124);
+     Query OK, 1 row affected (0.00 sec)
+     
+   >>mysql> insert into test values(253);
+     ERROR 1264 (22003): Out of range value for column 'num' at row 1
+     
+   >>mysql> insert into test values(125);
+      Query OK, 1 row affected (0.00 sec)
+      
+   不带符号的范围例子：  
+   >>mysql> create table test1 (num tinyint unsigned);
+     Query OK, 0 rows affected (0.02 sec)
+     
+   >>mysql> insert into test1 values(-1);
+     ERROR 1264 (22003): Out of range value for column 'num' at row 1
+     
+   >>mysql> insert into test1 values(255);
+     Query OK, 1 row affected (0.00 sec)
+
+其余数值类型类似...
+
+
+(2)日期和时间类型
+
+   类型       大小（bytes） 范围                                 格式                用途
+>>DATE	      3	1000-01-01/9999-12-31	                  YYYY-MM-DD	         日期值
+>>TIME	      3	'-838:59:59'/'838:59:59'	               HH:MM:SS	            时间值或持续时间
+>>YEAR	      1	1901/2155	                              YYYY	               年份值
+>>DATETIME	   8	1000-01-01 00:00:00/9999-12-31 23:59:59	YYYY-MM-DD HH:MM:SS	混合日期和时间值
+>>TIMESTAMP	   4	1970-01-01 00:00:00/2038                  YYYYMMDD HHMMSS      混合日期和时间值，时间戳
+                  结束时间是第 2147483647 秒，北京时间 2038-1-19 11:14:07，格林尼治时间 2038年1月19日 凌晨 03:14:07
+     
+     
+(3)字符串类型
+
+   类型	               大小	                           用途
+>>CHAR	            0-255       bytes	            定长字符串
+>>VARCHAR	         0-65535     bytes	            变长字符串
+>>TINYBLOB	         0-255       bytes	            不超过255 个字符的二进制字符串
+>>TINYTEXT	         0-255       bytes	            短文本字符串
+>>BLOB	            0-65535     bytes	            二进制形式的长文本数据
+>>TEXT	            0-65535     bytes	            长文本数据
+>>MEDIUMBLOB	      0-16777215  bytes	            二进制形式的中等长度文本数据
+>>MEDIUMTEXT	      0-16777215  bytes	            中等长度文本数据
+>>LONGBLOB	         0-4294967295 bytes	         二进制形式的极大文本数据
+>>LONGTEXT	         0-4294967295 bytes	         极大文本数据
+等等...
+
+说明：
+char(n) 和 varchar(n) 中括号中 n 代表字符的个数，并不代表字节个数，比如 CHAR(30) 就可以存储 30 个字符。
+In char(n) and varchar(n), the n in the brackets represents the number of characters, not the number of bytes. For example, CHAR(30) can store 30 characters.
+
+CHAR 和 VARCHAR 类型类似，但它们保存和检索的方式不同。它们的最大长度和是否尾部空格被保留等方面也不同。在存储或检索过程中不进行大小写转换。
+CHAR and VARCHAR types are similar, but they are stored and retrieved in different ways. 
+Their maximum length and whether trailing spaces are preserved are also different. No case conversion is performed during storage or retrieval.
+
+BINARY 和 VARBINARY 类似于 CHAR 和 VARCHAR，不同的是它们包含二进制字符串而不要非二进制字符串。也就是说，它们包含字节字符串而不是字符字符串。
+这说明它们没有字符集，并且排序和比较基于列值字节的数值值。
+BINARY and VARBINARY are similar to CHAR and VARCHAR, except that they contain binary strings instead of non-binary strings. 
+That is, they contain byte strings rather than character strings.
+This means that they do not have a character set, and sorting and comparison are based on the numeric value of the column value byte.
+
+BLOB 是一个二进制大对象，可以容纳可变数量的数据。有 4 种 BLOB 类型：TINYBLOB、BLOB、MEDIUMBLOB 和 LONGBLOB。它们区别在于可容纳存储范围不同。
+BLOB is a binary large object that can hold a variable amount of data. There are 4 BLOB types: TINYBLOB, BLOB, MEDIUMBLOB, and LONGBLOB. 
+The difference between them lies in the storage range that can be accommodated.
+
+有 4 种 TEXT 类型：TINYTEXT、TEXT、MEDIUMTEXT 和 LONGTEXT。对应的这 4 种 BLOB 类型，可存储的最大长度不同，可根据实际情况选择。
+There are 4 TEXT types: TINYTEXT, TEXT, MEDIUMTEXT and LONGTEXT. The maximum length that can be stored is different for these 4 BLOB types, 
+which can be selected according to the actual situation.
+
+
+(4)我们在定义一个字段时，可以指定not null, 并default 0.
+example: >>mysql> insert into example values(null);
+                  ERROR 1048 (23000): Column 'id' cannot be null
+                  
+         >>mysql> select * from example;
+                  Empty set (0.00 sec)
+                  
+(5) Mysql还允许在数据类型关键字后面的括号内指定整数值的显示宽度, 例如，int(4).该可选显示宽度规定用于显示宽度小于指定的列宽度的值时从左侧填满宽度。
+    这里的4不代表数字大小，表示填入的数据是要大于等于4位的，如果与zerofill一起用，则不满足4位的话前面会用0填充，且zerofill时，默认是unsigned。
+    
+example:
+   mysql> create table test(
+       -> num1 int,
+       -> num2 int(4) zerofill,
+       -> num3 int(6) unsigned zerofill
+       -> );
+   Query OK, 0 rows affected, 4 warnings (0.01 sec)
+
+   mysql> insert into test values(21, 21, 21);
+   Query OK, 1 row affected (0.00 sec)
+
+   mysql> select * from test;
+   +------+------+--------+
+   | num1 | num2 | num3   |
+   +------+------+--------+
+   |   21 | 0021 | 000021 |
+   +------+------+--------+
+   1 row in set (0.00 sec)
+
+
+*************  数值类型bit的使用
+
+基本使用：
+>> mysql> create table if not exists test (id int, a bit(8));
+   Query OK, 0 rows affected (0.01 sec)
+   
+>> mysql> insert into test values(1, 3);
+   Query OK, 1 row affected (0.00 sec)
+   
+>> mysql> insert into test values(2, 65);
+   Query OK, 1 row affected (0.00 sec)
+   
+>> mysql> insert into test values(10, 10);
+   Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from test;
++------+------------+
+| id   | a          |
++------+------------+
+|    1 | 0x03       |
+|    2 | 0x41       |
+|   10 | 0x0A       |
++------+------------+
+3 rows in set (0.00 sec)
+
+细节说明：
+1. bit字段在显示时，按ascii码对应的字符来显示；
+2. 查询的时候仍然可以用；
+3.如果一个值只有0，1，可以考虑使用bit(1)，可以节约空间；
+4.位类型。M指定位数，默认值1，范围1-64.
+
+
+*************  数值类型 float 和decimal 的使用
+
+基本使用：
+float(M, D)[unsigned]      ###### decimal(M, D) [unsigned]
+M指定显示长度，d指定小数位数，占用空间4个字节
+
+float(4,2) 表示的范围是 -99.99~99.99
+float(4, 2) unsigned 表示的范围是 0～99.99  
+
+example:
+>> mysql> create table test (id int, salary float(4,2)); << here
+   Query OK, 0 rows affected, 1 warning (0.01 sec)
+   
+>> mysql> insert into test values(100, -99.99);
+   Query OK, 1 row affected (0.01 sec)
+   
+>> mysql> insert into test values(100, -99.991);                           <<<< 采用了四舍五入
+   Query OK, 1 row affected (0.00 sec)
+   
+>> mysql> insert into test values(100, -99.995);                           <<<< 采用了四舍五入
+   ERROR 1264 (22003): Out of range value for column 'salary' at row 1
+   
+>> mysql> select * from test;
+   +------+--------+
+   | id   | salary |
+   +------+--------+
+   |  100 | -99.99 |
+   |  100 | -99.99 |     << see here
+   +------+--------+
+   2 rows in set (0.00 sec)
+  
+  
+****** float 和 decimal 的区别
+
+float 和 decimal 的精度不一样
+float:单精度浮点数精确到大约7位小数
+decimal:精确度更高。整数最大位数M为65位，支持的十进制的最大位数（D）是30，如果D被省略，默认是0，如果M被省略，默认是10.
+如果希望小数的精度高，请选择decimal.
+
+example:
+   >>mysql> create table test (id int, salary1 float(10,8), salary2 decimal(10,8));
+     Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+   >>mysql> insert into test values(1, 23.12345612, 23.12345612);
+     Query OK, 1 row affected (0.01 sec)
+
+   >>mysql> select * from test;
+      +------+-------------+-------------+
+      | id   | salary1     | salary2     |
+      +------+-------------+-------------+
+      |    1 | 23.12345695 | 23.12345612 |
+      +------+-------------+-------------+
+      1 row in set (0.00 sec)
+
+
+************* CHAR(size) 和 VARCHAR(size)
+两者在使用时占用的空间机制不一样的，char占用size大小的字符空间，而varchar则只需要根据字符分配所需要的空间。
+char在存放空格时候会丢失，而varchar不会。
+
+基本使用：
+
+CHAR(size) 固定长度字符串，最大为255字符，size表示可以存放两个字符,不论中文还是英文；
+
+example: 
+   >> mysql> create table test (id int, name char(2));
+      Query OK, 0 rows affected (0.01 sec)
+
+   >> mysql> insert into test values(1, "ab");
+      Query OK, 1 row affected (0.00 sec)
+
+   >> mysql> insert into test values(2, "中国");
+      Query OK, 1 row affected (0.00 sec)
+
+   >> mysql> insert into test values(3, "abc");
+      ERROR 1406 (22001): Data too long for column 'name' at row 1
+
+VARCHAR(size) 可变字符长度串， 最大为65532字节【utf8 编码最大21844字符 1-3个字节用于记录大小】,其size可以多大取决于最大行大小与字符集。
+1. VARCHAR 长度可以指定为0到65535之间的值，但是有1-3个字节用于记录数据大小，所以说有效字节数为65535 - 3 = 65532.
+
+2.当我们的表编码utf8时，varchar(n)n最大的是65532/3 = 21844（因为utf8中，一个汉字占用3个字节），
+   如果你的表编码gbk，你的varchar(n) n最大是65532/2 = 32766(因为gbk中，一个汉字占用2个字节).
+
+ >>mysql> create table test (name varchar(21845));
+   ERROR 1118 (42000): Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+ >>mysql> create table test (name varchar(21844));
+   Query OK, 0 rows affected (0.00 sec)
+
+   # ----------------------------
+ >>mysql> create table test1 (id int, name varchar(21844));
+   ERROR 1118 (42000): Row size too large. The maximum row size for the used table type, not counting BLOBs, is 65535. This includes storage overhead, check the manual. You have to change some columns to TEXT or BLOBs
+   这里为什么不成功？？？是因为mysql里所有的字段加起来不能超过21844个字段（即65535个字节，这里包括了存储的）
+   # --------------------------
+   
+   
+************* datetime、timestamp 
+
+对于timesstamp，它把客户端插入的时间从当前时区转化为UTC（世界标准时间）进行存储。查询时，将其又转化为客户端当前时区进行返回。
+
+而对于datetime，不做任何改变，基本上是原样输入和输出。
+
+timestamp所能存储的时间范围为：'1970-01-01 00:00:01.000000' 到 '2038-01-19 03:14:07.999999'。
+
+datetime所能存储的时间范围为：'1000-01-01 00:00:00.000000' 到 '9999-12-31 23:59:59.999999'。
+
+总结：TIMESTAMP和DATETIME除了存储范围和存储方式不一样，没有太大区别。当然，对于跨时区的业务，TIMESTAMP更为合适。
+
+
+************* Enum 和 Set
+
+基本用法: 
+Enum 为
+基本用法: Enum为单选，set为多选，且两者都不能设置默认值
+
+
+mysql> create table test1 (name varchar(20),hobby set("篮球","足球","羽毛球") not null, sex enum("男","女")not null) charset=utf8 engine=Innodb;
+Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+mysql> insert into test1 values("王某", "篮球,羽毛球", "男");      >>篮球羽毛球等不能能给标点留空格。
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from test1;
++--------+------------------+-----+
+| name   | hobby            | sex |
++--------+------------------+-----+
+| 王某   | 篮球,羽毛球      | 男  |
++--------+------------------+-----+
+1 row in set (0.00 sec)
+
+添加set以及enum时候，也可以添加数值，如下：
+
+mysql> insert into test1 values("花某", 1, 2);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into test1 values("花某2", 2, 2);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into test1 values("花某3", 3, 2);   <<这里的第二个3表示的是1+2，即代表了 篮球 + 足球， 选取是按照值相加的，
+Query OK, 1 row affected (0.00 sec)                所以 羽毛球对应的为4，以此类推 数字5 对应 篮球（1） + 羽毛球（4）
+                                                      
+mysql> insert into test1 values("花某4", 4, 2);  
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from test1;
++---------+------------------+-----+
+| name    | hobby            | sex |
++---------+------------------+-----+
+| 王某    | 篮球,羽毛球      | 男  |
+| 花某    | 篮球             | 女  |
+| 花某2   | 足球             | 女  |
+| 花某3   | 篮球,足球        | 女  |
+| 花某4   | 羽毛球           | 女  |
++---------+------------------+-----+
+5 rows in set (0.00 sec)
+
+# ----------------------------------------------------------------------------------------------
+
+done！
