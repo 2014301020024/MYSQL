@@ -1,1 +1,68 @@
+'''    create the table    '''
+
+基本语法：
+CREATE TABLE table_name 
+(
+   field1 datatype,
+   field2 datatype,
+   field3 datatype
+)character set 字符集 collate 校对规则 engine 存储引擎方式
+
+说明：
+(1)大写字体都是关键字，不可更改
+(2)field:指定列名    
+(3)datatype:指定列类型（这里的数据类型指的是mysql数据类型）
+(4)character set 字符集，如果没有设置，则以表所在的数据库字符集为准；如果数据库也没有设置字符集，则以mysql默认的字符集为准，即为 utf8.
+(5)collate 校验规则，执行标准同character set.
+(6)engine表示表的引擎，例如InnoDB.
+   total: mysql> show engines;
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+    | Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+    | ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+    | BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+    | MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+    | FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+    | MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+    | PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+    | InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+    | MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+    | CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+    +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+  
+example:
+mysql> create table example(        
+    -> id int,                     >>>> int:整数
+    -> name varchar(60),           >>>> varchar(60):少于等于60个的字符
+    -> password char(32),          >>>> char 32位的md5的值
+    -> birthday date               >>>> date:日期
+    -> )character set utf8 engine MyISAM;
+Query OK, 0 rows affected, 1 warning (0.05 sec)
+
+细节说明：
+不同的存储引擎创建的表文件不一样；
+当engine MyISAM时，则创建的表存储时将会有三个文件，分别存储表的结构（*.frm），索引(*.MYI)，数据(*.MYD)；
+当engine InnoDB时，则创建的表存储时只会有一个文件，其他的数据则放在了别的地方...
+
+
+'''    create the table    '''
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
