@@ -1,1 +1,215 @@
+# ----------------------------------------------------------------------------------------------
+
+'''    display table information    '''
+
+语法：desc + 表名；
+展示各个columns的信息，数据类型等
+
+example:
+mysql> desc cost;
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| Date      | date         | YES  |     | NULL    |                |
+| Breakfast | int          | YES  |     | NULL    |                |
+| Lunch     | int          | YES  |     | NULL    |                |
+| Dinner    | int          | YES  |     | NULL    |                |
+| Snacks    | int          | YES  |     | NULL    |                |
+| Others    | int          | YES  |     | NULL    |                |
+| Sum       | int          | YES  |     | NULL    |                |
+| Id        | int unsigned | NO   | PRI | NULL    | auto_increment |
++-----------+--------------+------+-----+---------+----------------+
+8 rows in set (0.00 sec)
+
+# ----------------------------------------------------------------------------------------------
+
+'''    insert the data to table    '''
+
+基本语法：
+INSERT INTO tablename (column1, column2, ...) VALUES (value1, value2, ...);
+
+1.如果添加的字段是包含所有的字段，可以补血前面的字段列表（上面的 （column1, column2, ...））
+2.如果添加的字段不是所有的，而是一部分字段，则一定要写清楚字段列表，否则报错。
+
+example:
+mysql> create table test (name varchar(20), sex varchar(1), date date, grade int, comment text);
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> insert into test values("王某", "男", "1997-01-01", 30, "感觉可以");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into test (name, sex, date)values("李某", "男", "1998-1-11");
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from test;
++--------+------+------------+-------+--------------+
+| name   | sex  | date       | grade | comment      |
++--------+------+------------+-------+--------------+
+| 王某   | 男   | 1997-01-01 |    30 | 感觉可以     |
+| 李某   | 男   | 1998-01-11 |  NULL | NULL         |
++--------+------+------------+-------+--------------+
+2 rows in set (0.00 sec)
+
+# ----------------------------------------------------------------------------------------------
+
+'''    change the data    '''
+
+基本语法：
+UPDATE table_name SET 字段名1=新值, 字段名2=新值, ... WHERE 条件；
+
+如果不加where条件，则修改所有的对应数据。
+
+example:
+
+修改单个数据：
+mysql> update test set sex="女" where name="王某";
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from test;
++--------+------+------------+-------+--------------+
+| name   | sex  | date       | grade | comment      |
++--------+------+------------+-------+--------------+
+| 王某   | 女   | 1997-01-01 |    30 | 感觉可以     |
+| 李某   | 男   | 1998-01-11 |  NULL | NULL         |
++--------+------+------------+-------+--------------+
+2 rows in set (0.00 sec)
+
+修改多个数据：
+mysql> update test set sex="男", grade=40 where name="王某";
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from test;
++--------+------+------------+-------+--------------+
+| name   | sex  | date       | grade | comment      |
++--------+------+------------+-------+--------------+
+| 王某   | 男   | 1997-01-01 |    40 | 感觉可以     |
+| 李某   | 男   | 1998-01-11 |  NULL | NULL         |
++--------+------+------------+-------+--------------+
+2 rows in set (0.00 sec)
+
+# ----------------------------------------------------------------------------------------------
+
+'''   delete the data    '''
+
+基本语法:
+DELETE FROM 表名 WHERE 条件；
+
+如果不加where,则删除了整个table.
+delete 不能删除某一列的值.
+
+example:
+
+mysql> delete from test where name="王某";
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from test;
++--------+------+------------+-------+---------+
+| name   | sex  | date       | grade | comment |
++--------+------+------------+-------+---------+
+| 李某   | 男   | 1998-01-11 |  NULL | NULL    |
++--------+------+------------+-------+---------+
+1 row in set (0.00 sec)
+
+
+******** truncate table 表名; 
+两者之间的区别是： 
+(1) truncate table 表名； 执行速度快
+(2) delete from 表名 会返回一个值，truncate table 表名 不返回；
+(3) truncate table 表名；后面不能带where条件, 因此推荐使用delete from 表名.
+
+# ----------------------------------------------------------------------------------------------
+
+'''   select the data    '''
+
+基本语法:
+SELECT [DISTINCT] 字段名1, 字段名2... FROM 表名 WHERE 条件;
+
+DISTINCT:可选，是否删除重复数据
+
+SELECT * FROM 表名 WHERE 条件;
+说明:如果我们想获得所有的数据，则可以用 * 代替所有columns.
+
+更详细的操作请看这儿：
+https://sqlbolt.com/lesson/select_queries_introduction
+
+排序在 WHERE 条件 后面加 Order by + column名 ASC/DESC;
+
+整体：
+SELECT column, another_column, …
+FROM mytable
+WHERE condition(s)
+ORDER BY column ASC/DESC
+LIMIT num_limit 
+OFFSET num_offset;
+
+ASC/DESC 表示 升序或降序。
+
+LIMIT和OFFSET子句，这是一个有用的优化，用于向数据库指示您关注的结果的子集。LIMIT将减少要返回的行数，而可选的OFFSET将指定从何处开始计算行数。
+LIMIT and OFFSET clauses, which are a useful optimization to indicate to the database the subset of the results you care about.
+The LIMIT will reduce the number of rows to return, and the optional OFFSET will specify where to begin counting the number rows from.
+
+# ----------------------------------------------------------------------------------------------
+
+'''   altering tables    '''
+
+语法：
+Adding columns:
+ALTER TABLE mytable
+ADD column DataType OptionalTableConstraint 
+    DEFAULT default_value;
+
+Removing columns:
+ALTER TABLE mytable
+DROP column_to_be_deleted;
+
+Renaming the table:
+ALTER TABLE mytable
+RENAME TO new_table_name;
+
+Other changes:
+在继续进行操作之前，最好始终查阅数据库文档：
+https://dev.mysql.com/doc/refman/5.6/en/alter-table.html
+
+# ----------------------------------------------------------------------------------------------
+
+'''   joins tables    '''
+
+INNER JOIN 
+语法:
+SELECT column, another_table_column, …
+FROM mytable
+INNER JOIN another_table 
+    ON mytable.id = another_table.id
+WHERE condition(s)
+ORDER BY column, … ASC/DESC
+LIMIT num_limit OFFSET num_offset;
+
+这INNER JOIN是一个过程，它匹配来自第一个表和第二个表的具有相同键（由ON约束定义）的行，以使用两个表中的合并列创建结果行。
+
+
+********** 外部JOIN
+
+INNER JOIN可能不够用，因为结果表仅包含两个表中的数据。
+如果两个表具有非对称的数据，在不同的阶段中输入数据，可以很容易地发生，那么我们就必须使用LEFT JOIN，RIGHT JOIN或FULL JOIN代替，以确保所需要的数据没有结果丢失。
+
+语法:
+SELECT column, another_column, …
+FROM mytable
+INNER/LEFT/RIGHT/FULL JOIN another_table 
+    ON mytable.id = another_table.matching_id
+WHERE condition(s)
+ORDER BY column, … ASC/DESC
+LIMIT num_limit OFFSET num_offset;
+
+像INNER JOIN这三个新联接一样，必须指定要在其上联接数据的列。
+将表A连接到表B时，LEFT JOIN无论是否在B中找到匹配的行，a都会简单地包含A中的行。
+RIGHT JOIN相同，但是相反，无论在A中是否找到匹配项，都将行保留在B中。
+FULL JOIN仅仅意味着保留两个表中的行，而不管另一个表中是否存在匹配的行。
+
+# ----------------------------------------------------------------------------------------------
+EXERCISES MORE, YOU KNOW MORE!
+
+done!
 
