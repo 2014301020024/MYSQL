@@ -68,16 +68,16 @@ Belongs to Ibm company, generally used in banking system, characterized by high 
 
 '''  SQL statement classification   '''
 
-（1）ddl语句（数据定义语句）
+（1）ddl语句（数据定义语句）data definition line
     create、alter
     
-（2）dml语句（数据操作语句）
+（2）dml语句（数据操作语句）date manipulate line
     update、insert、delete
     
-（3）dpl语句（数据查询语句）
+（3）dpl语句（数据查询语句）data query line
     select
     
-（4）dcl语句（数据控制语句）
+（4）dcl语句（数据控制语句）data control line
     在处理数据库事务和mysql用户管理的时候
     grant、revoke、commit、rollback、savepoint etc
   
